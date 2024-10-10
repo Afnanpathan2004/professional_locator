@@ -7,12 +7,12 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance; // Instance of FirebaseAuth
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   String email = '';
   String password = '';
-  bool isLoading = false; // Loading state
+  bool isLoading = false;
 
-  final _formKey = GlobalKey<FormState>(); // Form key for validation
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: _formKey, // Wrap the inputs in a Form widget
+          key: _formKey,
           child: Column(
             children: [
               TextFormField(
@@ -32,14 +32,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
                   }
-                  // Basic email format validation
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Please enter a valid email';
-                  }
                   return null;
                 },
                 onChanged: (value) {
-                  email = value; // Capture email input
+                  email = value;
                 },
               ),
               TextFormField(
@@ -49,46 +45,37 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
                   }
-                  // Password length validation
                   if (value.length < 6) {
                     return 'Password must be at least 6 characters';
                   }
                   return null;
                 },
                 onChanged: (value) {
-                  password = value; // Capture password input
+                  password = value;
                 },
               ),
               const SizedBox(height: 20),
               isLoading
-                  ? const CircularProgressIndicator() // Show loading indicator
+                  ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState?.validate() ?? false) {
                           setState(() {
-                            isLoading = true; // Start loading
+                            isLoading = true;
                           });
-
                           try {
                             await _auth.createUserWithEmailAndPassword(
                               email: email,
                               password: password,
-                            ); // Register the user
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Registration Successful!')),
                             );
-
-                            // Clear the input fields
-                            email = '';
-                            password = '';
+                            Navigator.pushReplacementNamed(context, '/home');
                           } catch (e) {
-                            print(e);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Registration Failed: ${e.toString()}')),
                             );
                           } finally {
                             setState(() {
-                              isLoading = false; // Stop loading
+                              isLoading = false;
                             });
                           }
                         }

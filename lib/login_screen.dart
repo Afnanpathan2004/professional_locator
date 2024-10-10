@@ -10,60 +10,77 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String email = '';
   String password = '';
+  bool isLoading = false;
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              decoration: InputDecoration(labelText: 'Email'),
-              onChanged: (value) {
-                email = value;
-              },
-            ),
-            TextField(
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-              onChanged: (value) {
-                password = value;
-              },
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await _auth.signInWithEmailAndPassword(
-                    email: email,
-                    password: password,
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Login Successful!'),
-                  ));
-                  // Navigate to the main home screen or wherever you want after login
-                  Navigator.pushReplacementNamed(context, '/home');  
-                } catch (e) {
-                  print(e);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Login Failed'),
-                  ));
-                }
-              },
-              child: Text('Login'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Navigate to the registration screen
-                Navigator.pushNamed(context, '/register');
-              },
-              child: Text('Don’t have an account? Register here.'),
-            ),
-          ],
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  email = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  password = value;
+                },
+              ),
+              const SizedBox(height: 20),
+              isLoading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          try {
+                            await _auth.signInWithEmailAndPassword(
+                              email: email,
+                              password: password,
+                            );
+                            Navigator.pushReplacementNamed(context, '/home');
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Login Failed: ${e.toString()}')),
+                            );
+                          } finally {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
+                        }
+                      },
+                      child: const Text('Login'),
+                    ),
+            ],
+          ),
         ),
       ),
     );

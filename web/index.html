@@ -34,5 +34,29 @@
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    const firebaseConfig = 
+    {  
+      apiKey: "AIzaSyC_JPFhwmzDjj84WPjDl1V4V3Wv5SBVuXw",
+      authDomain: "professional-locator.firebaseapp.com",
+      projectId: "professional-locator",
+      storageBucket: "professional-locator.appspot.com",
+      messagingSenderId: "586432402264",
+      appId: "1:586432402264:web:79558fb2b43f7495328b2d",
+      measurementId: "G-QM6CXY61J8"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
+  
 </body>
 </html>
