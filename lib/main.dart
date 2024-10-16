@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
-import 'login_screen.dart'; // Import the new login screen
-import 'registration_screen.dart'; // Import the Registration screen
-import 'home_screen.dart'; // Import the Home screen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure binding for Firebase
@@ -195,7 +192,107 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 }
 
-// Ensure you define your HomeScreen widget here
+// Create the Login Screen
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance; // Instance of FirebaseAuth
+  String email = '';
+  String password = '';
+  bool isLoading = false;
+
+  final _formKey = GlobalKey<FormState>(); // Form key for validation
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey, // Wrap the inputs in a Form widget
+          child: Column(
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  // Basic email format validation
+                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  email = value; // Capture email input
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  if (value.length < 6) {
+                    return 'Password must be at least 6 characters';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  password = value; // Capture password input
+                },
+              ),
+              const SizedBox(height: 20),
+              isLoading
+                  ? const CircularProgressIndicator() // Show loading indicator
+                  : ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          setState(() {
+                            isLoading = true; // Start loading
+                          });
+
+                          try {
+                            await _auth.signInWithEmailAndPassword(
+                              email: email,
+                              password: password,
+                            ); // Sign in the user
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Login Successful!')),
+                            );
+
+                            Navigator.pushNamed(context, '/home'); // Navigate to home
+                          } catch (e) {
+                            print(e);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Login Failed: ${e.toString()}')),
+                            );
+                          } finally {
+                            setState(() {
+                              isLoading = false; // Stop loading
+                            });
+                          }
+                        }
+                      },
+                      child: const Text('Login'),
+                    ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Create the HomeScreen widget
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
