@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http; // Import the http package
+import 'dart:convert'; // For JSON encoding/decoding
 
 class RegistrationScreen extends StatefulWidget {
   @override
@@ -7,12 +8,45 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _formKey = GlobalKey<FormState>();
   String email = '';
   String password = '';
-  bool isLoading = false;
 
-  final _formKey = GlobalKey<FormState>();
+  Future<void> _register() async {
+    final response = await http.post(
+      Uri.parse('https://yourapi.com/api/register'),  // Replace with your actual registration URL
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': email,
+        'password': password,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      // Successful registration
+      Navigator.pushNamed(context, '/home'); // Navigate to home screen
+    } else {
+      // Handle error
+      final responseData = jsonDecode(response.body);
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Error'),
+          content: Text(responseData['message'] ?? 'Registration failed.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(ctx).pop();
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +66,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
                   }
+                  // Basic email format validation
+                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                    return 'Please enter a valid email';
+                  }
                   return null;
                 },
                 onChanged: (value) {
-                  email = value;
+                  email = value; // Capture email input
                 },
               ),
               TextFormField(
@@ -45,43 +83,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
                   }
-                  if (value.length < 6) {
-                    return 'Password must be at least 6 characters';
-                  }
                   return null;
                 },
                 onChanged: (value) {
-                  password = value;
+                  password = value; // Capture password input
                 },
               ),
               const SizedBox(height: 20),
-              isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState?.validate() ?? false) {
-                          setState(() {
-                            isLoading = true;
-                          });
-                          try {
-                            await _auth.createUserWithEmailAndPassword(
-                              email: email,
-                              password: password,
-                            );
-                            Navigator.pushReplacementNamed(context, '/home');
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Registration Failed: ${e.toString()}')),
-                            );
-                          } finally {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
-                        }
-                      },
-                      child: const Text('Register'),
-                    ),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState?.validate() ?? false) {
+                    _register(); // Call the registration function
+                  }
+                },
+                child: const Text('Register'),
+              ),
             ],
           ),
         ),
