@@ -1,106 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;  // Import the http package
-import 'dart:convert';  // For JSON encoding/decoding
 
-class LoginScreen extends StatefulWidget {
-  @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  String email = '';
-  String password = '';
-
-  Future<void> _login() async {
-    final response = await http.post(
-      Uri.parse('https://yourapi.com/api/login'),  // Replace with your actual login URL
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': email,
-        'password': password,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      // Successful login
-      Navigator.pushNamed(context, '/home');  // Navigate to home screen
-    } else {
-      // Handle error
-      final responseData = jsonDecode(response.body);
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Error'),
-          content: Text(responseData['message'] ?? 'Login failed.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(ctx).pop();
-              },
-            ),
-          ],
-        ),
-      );
-    }
-  }
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
+        centerTitle: true,
+        backgroundColor: Colors.blueAccent,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  // Basic email format validation
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  email = value; // Capture email input
-                },
+        child: Column(
+          children: <Widget>[
+            const SizedBox(height: 20),
+            Text(
+              'Welcome Back',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            _buildTextField('Email', isEmail: true),
+            _buildTextField('Password', isPassword: true),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Handle login logic here
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  password = value; // Capture password input
-                },
+              child: const Text(
+                'Login',
+                style: TextStyle(fontSize: 18),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    _login(); // Call the login function
-                  }
-                },
-                child: const Text('Login'),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label, {bool isEmail = false, bool isPassword = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: TextField(
+        obscureText: isPassword,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: Colors.blueAccent),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+          ),
+          labelStyle: const TextStyle(color: Colors.blueAccent),
+        ),
+        keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
       ),
     );
   }
