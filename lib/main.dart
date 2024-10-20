@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart'; // Import the Login screen
 import 'registration_screen.dart'; // Import the Registration screen
-import 'home_screen.dart'; // Import the Home screen
+import 'home_screen.dart'; // Import the Home screen (if needed)
+import 'main_page.dart'; // Import the MainPage file
 
 void main() {
   runApp(const MyApp());
@@ -13,22 +14,25 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Professional Locator',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
+      // Setting the initial route to the Welcome page (MyHomePage)
       initialRoute: '/',
       routes: {
-        '/': (context) => const MyHomePage(title: 'Welcome'), // Set the HomePage as the home screen
-        '/register': (context) => RegistrationScreen(),
-        '/login': (context) => LoginScreen(),
-        '/home': (context) => HomeScreen(), // Ensure HomeScreen is defined
+        '/': (context) => const MyHomePage(title: 'Welcome to Professional Locator'), // HomePage is the welcome screen
+        '/register': (context) => RegistrationScreen(), // Register screen route
+        '/login': (context) => LoginScreen(), // Login screen route
+        '/home': (context) => HomeScreen(), // (Optional) Home screen if needed
+        '/main': (context) => MainPage(), // MainPage as the dashboard after login
       },
     );
   }
 }
 
+// The Welcome screen (MyHomePage) where users can register or login
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key, required this.title});
 
