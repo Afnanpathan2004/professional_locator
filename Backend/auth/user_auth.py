@@ -1,11 +1,13 @@
-from passlib.context import CryptContext
+from passlib.context import CryptContext # type: ignore
 from fastapi import Depends, HTTPException, Response
-from pymongo import MongoClient
+from pymongo import MongoClient # type: ignore
 from fastapi.security import OAuth2PasswordRequestForm
 from .jwt import create_access_token
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
+from Backend.auth.user_auth import register_user, login_for_access_token, collection, ACCESS_TOKEN_EXPIRE_MINUTES
+
 load_dotenv()
 
 # Token expiration time

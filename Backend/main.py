@@ -1,12 +1,14 @@
 from fastapi import FastAPI
-from api.routes import router as auth_router
+from pydantic import BaseModel
 
 app = FastAPI()
 
-# Register authentication routes
-app.include_router(auth_router)
+class UserData(BaseModel):
+    username: str
+    password: str
+    additional_field: str
 
-# Root route for testing
-@app.get("/")
-def root():
-    return {"message": "Welcome to the Proximity-based Professional Locator API"}
+@app.post("/submit")
+async def submit_data(data: UserData):
+    print(f"Received data: {data}")
+    return {"message": "Data received successfully!", "username": data.username, "additional_field": data.additional_field}

@@ -4,8 +4,9 @@ from auth.user_auth import register_user, login_for_access_token, collection, AC
 from auth.jwt import verify_token, Secret_key, algo
 from auth.user_schema import UserCreate, Token
 from auth.jwt import oauth2, create_access_token
-from jose import JWTError, jwt
+from jose import JWTError, jwt 
 from datetime import timedelta
+from Backend.auth.user_auth import register_user, login_for_access_token, collection, ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter()
 

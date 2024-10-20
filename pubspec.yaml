@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.2.2
+  http: 1.2.2
   cupertino_icons: ^1.0.6
   firebase_data_connect: ^0.1.2
 
